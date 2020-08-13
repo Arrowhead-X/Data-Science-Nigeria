@@ -5,7 +5,8 @@
     "colab": {
       "name": "Untitled1.ipynb",
       "provenance": [],
-      "authorship_tag": "ABX9TyOVFOnU3WcbuXIuUUkpzaRN",
+      "mount_file_id": "1iCv51UJQQw6xCZEL2_aoUbE0hI6D3V5j",
+      "authorship_tag": "ABX9TyMRjkh9/5cdtkA/qcMmjdmD",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -32,9 +33,898 @@
         "colab": {}
       },
       "source": [
-        ""
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.neighbors import KNeighborsClassifier\n",
+        "from sklearn.preprocessing import LabelEncoder\n",
+        "\n"
       ],
-      "execution_count": null,
+      "execution_count": 42,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "n941LQhFmJ3l",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 317
+        },
+        "outputId": "1034b9fd-d427-4b4e-964e-12b0cc8527ec"
+      },
+      "source": [
+        "Train = pd.read_csv('/content/drive/My Drive/Churn_Train.csv')\n",
+        "Test = pd.read_csv('/content/drive/My Drive/Test.csv')\n",
+        "Train.head()"
+      ],
+      "execution_count": 23,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>user_id</th>\n",
+              "      <th>REGION</th>\n",
+              "      <th>TENURE</th>\n",
+              "      <th>MONTANT</th>\n",
+              "      <th>FREQUENCE_RECH</th>\n",
+              "      <th>REVENUE</th>\n",
+              "      <th>ARPU_SEGMENT</th>\n",
+              "      <th>FREQUENCE</th>\n",
+              "      <th>DATA_VOLUME</th>\n",
+              "      <th>ON_NET</th>\n",
+              "      <th>ORANGE</th>\n",
+              "      <th>TIGO</th>\n",
+              "      <th>ZONE1</th>\n",
+              "      <th>ZONE2</th>\n",
+              "      <th>MRG</th>\n",
+              "      <th>REGULARITY</th>\n",
+              "      <th>TOP_PACK</th>\n",
+              "      <th>FREQ_TOP_PACK</th>\n",
+              "      <th>CHURN</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>dcf68cc2fb515ccad7d8b9b3bd80ee2a4b270063</td>\n",
+              "      <td>SAINT-LOUIS</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>17000.0</td>\n",
+              "      <td>32.0</td>\n",
+              "      <td>18000.0</td>\n",
+              "      <td>6000.0</td>\n",
+              "      <td>34.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>97.0</td>\n",
+              "      <td>355.0</td>\n",
+              "      <td>6.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>62</td>\n",
+              "      <td>All-net 500F=2000F;5d</td>\n",
+              "      <td>35.0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>71c44b5ba328db5c4192a80f7cf8f244d9350ed0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>4300.0</td>\n",
+              "      <td>29.0</td>\n",
+              "      <td>4427.0</td>\n",
+              "      <td>1476.0</td>\n",
+              "      <td>37.0</td>\n",
+              "      <td>1764.0</td>\n",
+              "      <td>8.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2.0</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>40</td>\n",
+              "      <td>Data: 100 F=40MB,24H</td>\n",
+              "      <td>22.0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>ce46411b1526c94f20a383b8cb188f8d27f82a0a</td>\n",
+              "      <td>TAMBACOUNDA</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>1500.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>1500.0</td>\n",
+              "      <td>500.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>30.0</td>\n",
+              "      <td>30.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>32</td>\n",
+              "      <td>All-net 500F=2000F;5d</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>f467cdb6669818373c26c2bad44e01ba66f97d21</td>\n",
+              "      <td>FATICK</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>1500.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>2497.0</td>\n",
+              "      <td>832.0</td>\n",
+              "      <td>4.0</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>159.0</td>\n",
+              "      <td>45.0</td>\n",
+              "      <td>19.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>18</td>\n",
+              "      <td>On net 200F=Unlimited _call24H</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>ec45e1a1888a32b5dcce0954cfec20c6e037db31</td>\n",
+              "      <td>FATICK</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>498.0</td>\n",
+              "      <td>166.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>1.0</td>\n",
+              "      <td>1.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>50</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                                    user_id       REGION  ... FREQ_TOP_PACK  CHURN\n",
+              "0  dcf68cc2fb515ccad7d8b9b3bd80ee2a4b270063  SAINT-LOUIS  ...          35.0      0\n",
+              "1  71c44b5ba328db5c4192a80f7cf8f244d9350ed0          NaN  ...          22.0      0\n",
+              "2  ce46411b1526c94f20a383b8cb188f8d27f82a0a  TAMBACOUNDA  ...           3.0      0\n",
+              "3  f467cdb6669818373c26c2bad44e01ba66f97d21       FATICK  ...           3.0      0\n",
+              "4  ec45e1a1888a32b5dcce0954cfec20c6e037db31       FATICK  ...           NaN      0\n",
+              "\n",
+              "[5 rows x 19 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 23
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "CHFU-m3ymc6U",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 301
+        },
+        "outputId": "a632e2a7-4d93-4b1f-ddf3-eee7a4744b22"
+      },
+      "source": [
+        "Test.head()"
+      ],
+      "execution_count": 24,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>user_id</th>\n",
+              "      <th>REGION</th>\n",
+              "      <th>TENURE</th>\n",
+              "      <th>MONTANT</th>\n",
+              "      <th>FREQUENCE_RECH</th>\n",
+              "      <th>REVENUE</th>\n",
+              "      <th>ARPU_SEGMENT</th>\n",
+              "      <th>FREQUENCE</th>\n",
+              "      <th>DATA_VOLUME</th>\n",
+              "      <th>ON_NET</th>\n",
+              "      <th>ORANGE</th>\n",
+              "      <th>TIGO</th>\n",
+              "      <th>ZONE1</th>\n",
+              "      <th>ZONE2</th>\n",
+              "      <th>MRG</th>\n",
+              "      <th>REGULARITY</th>\n",
+              "      <th>TOP_PACK</th>\n",
+              "      <th>FREQ_TOP_PACK</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>af900d87e73b7ff6509d2203df4704a98aa5f2a6</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>1</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>5335efd940280b82143272275637d1e65d37eadb</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>10.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>1.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>2</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>a581f4fa08677c26f83f643248c667e241043086</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>1900.0</td>\n",
+              "      <td>15.0</td>\n",
+              "      <td>2299.0</td>\n",
+              "      <td>766.0</td>\n",
+              "      <td>21.0</td>\n",
+              "      <td>414.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>7.0</td>\n",
+              "      <td>2.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>27</td>\n",
+              "      <td>Data: 100 F=40MB,24H</td>\n",
+              "      <td>17.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>64f67177d0775262b8087a9e2e3b8061b6324ae6</td>\n",
+              "      <td>DAKAR</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>3000.0</td>\n",
+              "      <td>9.0</td>\n",
+              "      <td>2603.0</td>\n",
+              "      <td>868.0</td>\n",
+              "      <td>14.0</td>\n",
+              "      <td>332.0</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>23.0</td>\n",
+              "      <td>4.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>46</td>\n",
+              "      <td>IVR Echat_Daily_50F</td>\n",
+              "      <td>3.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>0d6009a4594c4be22449b8d9cc01a0bcea98faea</td>\n",
+              "      <td>DAKAR</td>\n",
+              "      <td>K &gt; 24 month</td>\n",
+              "      <td>32000.0</td>\n",
+              "      <td>47.0</td>\n",
+              "      <td>33000.0</td>\n",
+              "      <td>11000.0</td>\n",
+              "      <td>47.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>128.0</td>\n",
+              "      <td>555.0</td>\n",
+              "      <td>280.0</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NO</td>\n",
+              "      <td>61</td>\n",
+              "      <td>All-net 500F=2000F;5d</td>\n",
+              "      <td>65.0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                                    user_id  ... FREQ_TOP_PACK\n",
+              "0  af900d87e73b7ff6509d2203df4704a98aa5f2a6  ...           NaN\n",
+              "1  5335efd940280b82143272275637d1e65d37eadb  ...           NaN\n",
+              "2  a581f4fa08677c26f83f643248c667e241043086  ...          17.0\n",
+              "3  64f67177d0775262b8087a9e2e3b8061b6324ae6  ...           3.0\n",
+              "4  0d6009a4594c4be22449b8d9cc01a0bcea98faea  ...          65.0\n",
+              "\n",
+              "[5 rows x 18 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 24
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ZcZk7e6gomLn",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 372
+        },
+        "outputId": "cb4b6fd9-4f61-4798-e1a5-4af62b660b7c"
+      },
+      "source": [
+        "Train.isnull().sum()"
+      ],
+      "execution_count": 26,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "user_id                0\n",
+              "REGION            157520\n",
+              "TENURE                 0\n",
+              "MONTANT           140277\n",
+              "FREQUENCE_RECH    140277\n",
+              "REVENUE           134663\n",
+              "ARPU_SEGMENT      134663\n",
+              "FREQUENCE         134663\n",
+              "DATA_VOLUME       196854\n",
+              "ON_NET            145819\n",
+              "ORANGE            166317\n",
+              "TIGO              239386\n",
+              "ZONE1             368310\n",
+              "ZONE2             374487\n",
+              "MRG                    0\n",
+              "REGULARITY             0\n",
+              "TOP_PACK          167329\n",
+              "FREQ_TOP_PACK     167329\n",
+              "CHURN                  0\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 26
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "YqTPwHYOXezK",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 354
+        },
+        "outputId": "6477caef-f4df-4a26-d901-d08a9c5afd1f"
+      },
+      "source": [
+        "Test.isnull().any()"
+      ],
+      "execution_count": 27,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "user_id           False\n",
+              "REGION             True\n",
+              "TENURE            False\n",
+              "MONTANT            True\n",
+              "FREQUENCE_RECH     True\n",
+              "REVENUE            True\n",
+              "ARPU_SEGMENT       True\n",
+              "FREQUENCE          True\n",
+              "DATA_VOLUME        True\n",
+              "ON_NET             True\n",
+              "ORANGE             True\n",
+              "TIGO               True\n",
+              "ZONE1              True\n",
+              "ZONE2              True\n",
+              "MRG               False\n",
+              "REGULARITY        False\n",
+              "TOP_PACK           True\n",
+              "FREQ_TOP_PACK      True\n",
+              "dtype: bool"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 27
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "NW9E_1_lpukj",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 372
+        },
+        "outputId": "42531d79-c65b-47c5-82d6-d7ce2e464a36"
+      },
+      "source": [
+        "Train.dtypes"
+      ],
+      "execution_count": 28,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "user_id            object\n",
+              "REGION             object\n",
+              "TENURE             object\n",
+              "MONTANT           float64\n",
+              "FREQUENCE_RECH    float64\n",
+              "REVENUE           float64\n",
+              "ARPU_SEGMENT      float64\n",
+              "FREQUENCE         float64\n",
+              "DATA_VOLUME       float64\n",
+              "ON_NET            float64\n",
+              "ORANGE            float64\n",
+              "TIGO              float64\n",
+              "ZONE1             float64\n",
+              "ZONE2             float64\n",
+              "MRG                object\n",
+              "REGULARITY          int64\n",
+              "TOP_PACK           object\n",
+              "FREQ_TOP_PACK     float64\n",
+              "CHURN               int64\n",
+              "dtype: object"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 28
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "IHmzQeWptYt3",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "Train[['REGION', 'TOP_PACK']] = Train[['REGION', 'TOP_PACK']].fillna(value ='None')\n",
+        "Test[['REGION', 'TOP_PACK']] = Test[['REGION', 'TOP_PACK']].fillna(value ='None')"
+      ],
+      "execution_count": 35,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "xyW9KFtOZHLk",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "for i in ['MONTANT', 'FREQUENCE_RECH', 'REVENUE',\n",
+        "       'ARPU_SEGMENT', 'FREQUENCE', 'DATA_VOLUME', 'ON_NET', 'ORANGE', 'TIGO',\n",
+        "       'ZONE1', 'ZONE2', 'FREQ_TOP_PACK']:\n",
+        "    Train[i] = Train[i].fillna(value = 0)\n",
+        "    Test[i] = Test[i].fillna(value = 0)"
+      ],
+      "execution_count": 75,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lNXTZ3XIuDWO",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 354
+        },
+        "outputId": "4e447b48-c442-43f0-b21e-22d13fd726ff"
+      },
+      "source": [
+        "Test.isnull().any()"
+      ],
+      "execution_count": 76,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "user_id           False\n",
+              "REGION            False\n",
+              "TENURE            False\n",
+              "MONTANT           False\n",
+              "FREQUENCE_RECH    False\n",
+              "REVENUE           False\n",
+              "ARPU_SEGMENT      False\n",
+              "FREQUENCE         False\n",
+              "DATA_VOLUME       False\n",
+              "ON_NET            False\n",
+              "ORANGE            False\n",
+              "TIGO              False\n",
+              "ZONE1             False\n",
+              "ZONE2             False\n",
+              "MRG               False\n",
+              "REGULARITY        False\n",
+              "TOP_PACK          False\n",
+              "FREQ_TOP_PACK     False\n",
+              "dtype: bool"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 76
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "MEQeJPbReGjw",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "X = Train.drop(['user_id', 'MRG', 'CHURN'], axis =1)\n",
+        "y = Train['CHURN']\n",
+        "\n",
+        "new_test = Test.drop(['user_id', 'MRG'], axis = 1)"
+      ],
+      "execution_count": 77,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "eR2WgiFQeppE",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 217
+        },
+        "outputId": "6d8cab7e-002c-4eb7-bac7-6d9e56a1a5e9"
+      },
+      "source": [
+        "for i in [\"REGION\", \"TENURE\", \"TOP_PACK\"]:\n",
+        "    X[i] = LabelEncoder().fit_transform(X[i])\n",
+        "    new_test[i] = LabelEncoder().fit_transform(new_test[i])\n",
+        "\n",
+        "X.head()"
+      ],
+      "execution_count": 78,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>REGION</th>\n",
+              "      <th>TENURE</th>\n",
+              "      <th>MONTANT</th>\n",
+              "      <th>FREQUENCE_RECH</th>\n",
+              "      <th>REVENUE</th>\n",
+              "      <th>ARPU_SEGMENT</th>\n",
+              "      <th>FREQUENCE</th>\n",
+              "      <th>DATA_VOLUME</th>\n",
+              "      <th>ON_NET</th>\n",
+              "      <th>ORANGE</th>\n",
+              "      <th>TIGO</th>\n",
+              "      <th>ZONE1</th>\n",
+              "      <th>ZONE2</th>\n",
+              "      <th>REGULARITY</th>\n",
+              "      <th>TOP_PACK</th>\n",
+              "      <th>FREQ_TOP_PACK</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>10</td>\n",
+              "      <td>7</td>\n",
+              "      <td>17000.0</td>\n",
+              "      <td>32.0</td>\n",
+              "      <td>18000.0</td>\n",
+              "      <td>6000.0</td>\n",
+              "      <td>34.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>97.0</td>\n",
+              "      <td>355.0</td>\n",
+              "      <td>6.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>62</td>\n",
+              "      <td>15</td>\n",
+              "      <td>35.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>9</td>\n",
+              "      <td>7</td>\n",
+              "      <td>4300.0</td>\n",
+              "      <td>29.0</td>\n",
+              "      <td>4427.0</td>\n",
+              "      <td>1476.0</td>\n",
+              "      <td>37.0</td>\n",
+              "      <td>1764.0</td>\n",
+              "      <td>8.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>2.0</td>\n",
+              "      <td>40</td>\n",
+              "      <td>25</td>\n",
+              "      <td>22.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>12</td>\n",
+              "      <td>7</td>\n",
+              "      <td>1500.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>1500.0</td>\n",
+              "      <td>500.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>30.0</td>\n",
+              "      <td>30.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>32</td>\n",
+              "      <td>15</td>\n",
+              "      <td>3.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>2</td>\n",
+              "      <td>7</td>\n",
+              "      <td>1500.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>2497.0</td>\n",
+              "      <td>832.0</td>\n",
+              "      <td>4.0</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>159.0</td>\n",
+              "      <td>45.0</td>\n",
+              "      <td>19.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>18</td>\n",
+              "      <td>85</td>\n",
+              "      <td>3.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>2</td>\n",
+              "      <td>7</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>498.0</td>\n",
+              "      <td>166.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>1.0</td>\n",
+              "      <td>1.0</td>\n",
+              "      <td>3.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>-99999.0</td>\n",
+              "      <td>50</td>\n",
+              "      <td>83</td>\n",
+              "      <td>-99999.0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "   REGION  TENURE  MONTANT  ...  REGULARITY  TOP_PACK  FREQ_TOP_PACK\n",
+              "0      10       7  17000.0  ...          62        15           35.0\n",
+              "1       9       7   4300.0  ...          40        25           22.0\n",
+              "2      12       7   1500.0  ...          32        15            3.0\n",
+              "3       2       7   1500.0  ...          18        85            3.0\n",
+              "4       2       7 -99999.0  ...          50        83       -99999.0\n",
+              "\n",
+              "[5 rows x 16 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 78
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "V7sJEeuTvGfC",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "4324b2ab-f2ae-4c9a-dc13-e43c195c82e2"
+      },
+      "source": [
+        "X_train, X_test, y_train, y_test = train_test_split(X,y, random_state = 0)\n",
+        "\n",
+        "\n",
+        "knn = KNeighborsClassifier(n_neighbors= 40).fit(X_train, y_train)\n",
+        "print(f'Accuracy = {knn.score(X_test, y_test)}')"
+      ],
+      "execution_count": 79,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Accuracy = 0.87603\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "pM4BsBv0wj2n",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "9c04be76-654c-4d25-8a80-42309e201473"
+      },
+      "source": [
+        "predict = knn.predict(new_test)\n",
+        "print(f'prediction = {predict}')\n"
+      ],
+      "execution_count": 59,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "prediction = [1 1 0 ... 0 0 0]\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "AaWGOzWBOsam",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "pd.DataFrame({'user_id': Test['user_id'], 'CHURN': predict}).to_csv('submission.csv', index = False)"
+      ],
+      "execution_count": 61,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "WKC9n9jwmUD_",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "data = pd.read_csv('submission.csv')\n",
+        "\n",
+        "data = data[data['CHURN'] == 1]\n",
+        "\n",
+        "data.to_csv ('submission_file.csv', index = False)"
+      ],
+      "execution_count": 65,
       "outputs": []
     }
   ]
